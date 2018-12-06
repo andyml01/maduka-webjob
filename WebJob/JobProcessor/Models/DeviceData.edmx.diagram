@@ -4,8 +4,8 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="d3f63f5b528b4c65ad7906a4eb0e9c9a" Name="Diagram1">
-        <EntityTypeShape EntityType="IoTDbModels.DeviceData" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
+      <Diagram DiagramId="49961777f8bf462297e3b8cf52eca123" Name="Diagram1">
+        <EntityTypeShape EntityType="JmterDBModel.DeviceData" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

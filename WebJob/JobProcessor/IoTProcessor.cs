@@ -15,7 +15,7 @@ using Newtonsoft.Json;
 namespace JobProcessor
 {
 
-    class IoTProcessor : IEventProcessor
+    public class IoTProcessor : IEventProcessor
     {
         public static string StorageConnectionString { get; set; }
         public static string ServiceBusConnectionString { get; set; }
@@ -42,7 +42,7 @@ namespace JobProcessor
             var storageAccount = CloudStorageAccount.Parse(StorageConnectionString);
             blobClient = storageAccount.CreateCloudBlobClient();
             //blobContainer = blobClient.GetContainerReference("d2ctutorial");
-            blobContainer = blobClient.GetContainerReference("samplesimlog"); ////
+            blobContainer = blobClient.GetContainerReference("newcontainer"); ////
             blobContainer.CreateIfNotExists();
         }
 
@@ -91,26 +91,30 @@ namespace JobProcessor
                 byte[] data = eventData.GetBytes();
                 var text = Encoding.UTF8.GetString(data);
 
-             //   if (text != "")
-             //   {
-                    // 在這裡把IoT Hub的資料抓出來, text就是從IoT Hub中取得的JSON資料字串
-                    // 寫入到資料庫之中
-             //       Console.WriteLine(text);
-             //       Models.DeviceData objData = JsonConvert.DeserializeObject<Models.DeviceData>(text);
-             //       objDb.DeviceData.Add(objData);
-             //       objDb.SaveChanges();
-             //   }
+               
+               //寫入檢查點的動作，這一段也是放在foreach中直接貼上就可以
+                 if (toAppend.Length + data.Length > MAX_BLOCK_SIZE || stopwatch.Elapsed > MAX_CHECKPOINT_TIME)
+                 {
+                      await AppendAndCheckpoint(context);
+                 }
 
-              //寫入檢查點的動作，這一段也是放在foreach中直接貼上就可以
-              // if (toAppend.Length + data.Length > MAX_BLOCK_SIZE || stopwatch.Elapsed > MAX_CHECKPOINT_TIME)
-               // {
-               //     await AppendAndCheckpoint(context);
-              //  }
-
-              //  await toAppend.WriteAsync(data, 0, data.Length);
+                  await toAppend.WriteAsync(data, 0, data.Length);
 
                 Console.WriteLine(string.Format("Message received.  Partition: '{0}', Data: '{1}'",
                     context.Lease.PartitionId, Encoding.UTF8.GetString(data)));
+
+                if (text != "")
+                {
+                    // 在這裡把IoT Hub的資料抓出來, text就是從IoT Hub中取得的JSON資料字串
+                    // 寫入到資料庫之中
+                    Console.WriteLine(text);
+                    Models.DeviceData objData = JsonConvert.DeserializeObject<Models.DeviceData>(text);
+                    objDb.DeviceData.Add(objData);
+                    Console.WriteLine(string.Format("Message received.  Partition: '{0}', Data: '{1}'",
+                   context.Lease.PartitionId, Encoding.UTF8.GetString(data)));
+                    objDb.SaveChanges();
+
+                }
             }
         }
 
